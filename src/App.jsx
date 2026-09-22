@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router";
 
 import "./App.css";
@@ -11,10 +11,16 @@ import EventsPage from "./pages/EventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import AboutPage from "./pages/AboutPage";
 
-import { initialEvents } from "./data/events";
 
 function App() {
-    const [events, setEvents] = useState(initialEvents);
+    const [events, setEvents] = useState([]);
+      useEffect(()=>{
+            fetch("http://localhost:5000/api/events")
+            .then((response)=>response.json())
+            .then((data)=>{
+                setEvents(data);
+            });
+        }, []);
 
     function handleAddEvent(newEvent) {
         setEvents([...events, newEvent]);

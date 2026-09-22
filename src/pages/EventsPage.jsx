@@ -1,6 +1,8 @@
 import EventSection from "../components/EventSection";
+import { useEffect } from "react";
 
 function EventsPage({ events, onDeleteEvent }) {
+  
     return (
         <>
             <section>
@@ -24,4 +26,3 @@ function EventsPage({ events, onDeleteEvent }) {
 }
 
 export default EventsPage;
-
