@@ -14,24 +14,31 @@ import AboutPage from "./pages/AboutPage";
 
 function App() {
     const [events, setEvents] = useState([]);
-      useEffect(()=>{
-            fetch("http://localhost:5000/api/events")
-            .then((response)=>response.json())
-            .then((data)=>{
-                setEvents(data);
-            });
-        }, []);
+
+    useEffect(()=>{
+        fetch("http://localhost:5000/api/events")
+        .then((response)=>response.json())
+        .then((data)=>{
+            setEvents(data);
+        });
+    }, []);
 
     function handleAddEvent(newEvent) {
         setEvents([...events, newEvent]);
     }
 
     function handleDeleteEvent(eventId) {
-        const updatedEvents = events.filter(function (event) {
-            return event.id !== eventId;
+        fetch(`http://localhost:5000/api/events/${eventId}`, {
+            method: "DELETE"
+        }).then((response)=>response.json())
+        .then((data)=>{
+            console.log(data);
+            fetch("http://localhost:5000/api/events")
+            .then((response)=>response.json())
+            .then((data)=>{
+                setEvents(data);
+            });
         });
-
-        setEvents(updatedEvents);
     }
 
     return (

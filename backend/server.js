@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 app.use(cors());
+
 const initialEvents = [
   {
     id: 1,
@@ -34,28 +35,34 @@ const initialEvents = [
       "Meet fellow photography enthusiasts and learn basic composition techniques.",
   },
 ];
-app.get("/",(req,res)=>{
-    res.send("backend is working ");
+
+app.get("/", (req, res)=>{
+    res.send("Backend is working");
 })
-app.get ("/api/events",(req,res)=>{
+
+app.get("/api/events", (req, res)=>{
     res.json(initialEvents);
-});
-app.delete("/api/events/:id",(req,res)=>{
-    const eventid = Number(req.params.id);
-    const eventindex = initialEvents.findIndex(function(event){
-        return event.id === eventid;
+})
+
+app.delete("/api/events/:id", (req, res)=>{
+    const eventId = Number(req.params.id);
+    const eventIndex = initialEvents.findIndex(function(event){
+        return event.id === eventId;
     });
-    if (eventindex === -1) {
+
+    if(eventIndex === -1){
         return res.status(404).json({
-            message: "Event not found"
+            message: "Event Not Found"
         });
-       
-    } 
-    initialEvents.splice(eventindex,1);
+    }
+
+    initialEvents.splice(eventIndex, 1);
+
     res.json({
-        message: "Event deleted successfully"
-    });
-});
-app.listen(5000,()=>{
-    console.log("server is running on port 5000");
+        message: "Event Deleted Successfully"
+    })
+})
+
+app.listen(5000, ()=>{
+    console.log("Server is running on port 5000");
 })
