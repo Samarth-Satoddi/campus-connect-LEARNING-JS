@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGODB_URI)
   console.log("MongoDB Connection Error: ", error);
 });
 
+
 const initialEvents = [
   {
     id: 1,
@@ -62,18 +63,16 @@ app.get("/api/events", async (req, res)=>{
     res.json(events);
 })
 
-app.delete("/api/events/:id", (req, res)=>{
-  const eventId = Number(req.params.id);
-  const eventIndex = initialEvents.findIndex(function(event){
-    return event.id === eventId;
-  });
-
-  if(eventIndex === -1){
-    return res.status(404).json({
-      message: "Event Not Found"
-    });
+app.delete("/api/events/:id", async(req, res)=>{
+  const deletedEvent = await Event.findByIdAndDelete(
+    req.params.id
+  )
+  
+  if(!deletedEvent){
+    return res.status(400).json({
+      message:"Event Not Found"
+    })
   }
-
   initialEvents.splice(eventIndex, 1);
   res.json({
     message: "Event Deleted Successfully"
