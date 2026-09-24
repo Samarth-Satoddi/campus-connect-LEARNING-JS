@@ -1,16 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function EventForm({ onAddEvent }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    date: "",
-    time: "",
-    location: "",
-    description: "",
-  });
+const emptyForm = {
+  title: "",
+  category: "",
+  date: "",
+  time: "",
+  location: "",
+  description: "",
+};
 
+function normalizeDateInput(value) {
+  if (!value) return "";
+
+  const parsedDate = new Date(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return value;
+  }
+
+  return parsedDate.toISOString().split("T")[0];
+}
+
+function normalizeTimeInput(value) {
+  if (!value) return "";
+
+  const amPmMatch = value.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+
+  if (amPmMatch) {
+    let hours = Number(amPmMatch[1]);
+    const minutes = amPmMatch[2];
+    const meridiem = amPmMatch[3].toUpperCase();
+
+    if (meridiem === "AM" && hours === 12) {
+      hours = 0;
+    }
+
+    if (meridiem === "PM" && hours < 12) {
+      hours += 12;
+    }
+
+    return `${String(hours).padStart(2, "0")}:${minutes}`;
+  }
+
+  return value.slice(0, 5);
+}
+
+function EventForm({ onAddEvent, onUpdateEvent, editingEvent }) {
+  const [formData, setFormData] = useState(emptyForm);
   const [formError, setFormError] = useState("");
+
+  useEffect(function () {
+    if (editingEvent != null) {
+      setFormData({
+        title: editingEvent.title,
+        category: editingEvent.category,
+        date: normalizeDateInput(editingEvent.date),
+        time: normalizeTimeInput(editingEvent.time),
+        location: editingEvent.location,
+        description: editingEvent.description,
+      });
+      return;
+    }
+
+    setFormData(emptyForm);
+  }, [editingEvent]);
 
   function handleChange(event) {
     const inputName = event.target.name;
@@ -37,8 +90,7 @@ function EventForm({ onAddEvent }) {
       return;
     }
 
-    const newEvent = {
-      id: Date.now(),
+    const eventData = {
       title: formData.title,
       category: formData.category,
       date: formData.date,
@@ -47,25 +99,29 @@ function EventForm({ onAddEvent }) {
       description: formData.description,
     };
 
-    onAddEvent(newEvent);
+    if (editingEvent != null) {
+      onUpdateEvent({
+        ...editingEvent,
+        ...eventData,
+      });
+    } else {
+      onAddEvent({
+        id: Date.now(),
+        ...eventData,
+      });
+    }
 
-    setFormData({
-      title: "",
-      category: "",
-      date: "",
-      time: "",
-      location: "",
-      description: "",
-    });
-
+    setFormData(emptyForm);
     setFormError("");
   }
 
+  const isEditing = editingEvent != null;
+
   return (
     <section className="event-form-section">
-      <p className="section-label">Create an Activity</p>
+      <p className="section-label">{isEditing ? "Update an Activity" : "Create an Activity"}</p>
 
-      <h2>Add a New Campus Event</h2>
+      <h2>{isEditing ? "Update Campus Event" : "Add a New Campus Event"}</h2>
 
       <form className="event-form" onSubmit={handleSubmit}>
         <div className="form-group">
@@ -151,7 +207,7 @@ function EventForm({ onAddEvent }) {
         {formError !== "" && <p className="form-error">{formError}</p>}
 
         <button className="submit-button" type="submit">
-          Add Event
+          {isEditing ? "Update Event" : "Create Event"}
         </button>
       </form>
     </section>

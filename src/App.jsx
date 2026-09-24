@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route, data } from "react-router";
 
 import "./App.css";
 
@@ -14,6 +14,7 @@ import AboutPage from "./pages/AboutPage";
 
 function App() {
     const [events, setEvents] = useState([]);
+    const [editingEvent, setEditingEvent] = useState(null);
 
     useEffect(()=>{
         fetch("http://localhost:5000/api/events")
@@ -24,7 +25,22 @@ function App() {
     }, []);
 
     function handleAddEvent(newEvent) {
-        setEvents([...events, newEvent]);
+        fetch("http://localhost:5000/api/events",{
+            method:"POST",
+            headers:{
+                "content-type":"application/json"
+            },
+            body: JSON.stringify(newEvent)
+         }).then((response)=>response.json())
+         .then((data)=>{
+            console.log(data);
+            fetch("http://localhost:5000/api/events")
+            .then((response)=>response.json())
+            .then((data)=>{
+                setEvents(data);
+                setEditingEvent(null);
+            });
+         })
     }
 
     function handleDeleteEvent(eventId) {
@@ -41,6 +57,33 @@ function App() {
         });
     }
 
+    function handleUpdateEvent(updatedEvent) {
+        fetch(`http://localhost:5000/api/events/${updatedEvent.id}`, {
+            method: "PUT",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(updatedEvent)
+        }).then((response)=>response.json())
+        .then((data)=>{
+            console.log(data);
+            fetch("http://localhost:5000/api/events")
+            .then((response)=>response.json())
+            .then((data)=>{
+                setEvents(data);
+                setEditingEvent(null);
+            });
+        });
+    }
+
+    function handleEditEvent(eventID){
+        const selectedEvent = events.find(function(event){
+            return event.id === eventID
+        });
+        setEditingEvent(selectedEvent);
+    }
+
+    
     return (
         <div>
             <Navbar />
@@ -52,7 +95,11 @@ function App() {
                         <HomePage
                             events={events}
                             onAddEvent={handleAddEvent}
+                            onUpdateEvent={handleUpdateEvent}
                             onDeleteEvent={handleDeleteEvent}
+                            onEditEvent={handleEditEvent}
+                            editingEvent={editingEvent}
+                            
                         />
                     }
                 />
