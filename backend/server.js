@@ -1,8 +1,23 @@
+require("dotenv").config();
+
 const express = require('express');
 const cors = require("cors");
 const app = express();
+const mongoose = require("mongoose")
+const dns = require("dns");
+
 app.use(cors());
 app.use(express.json());
+dns.setServers(['8.8.8.8']);
+
+mongoose.connect(process.env.MONGODB_URI)
+.then(()=>{
+    console.log("MongoDB Connect succefully");
+
+
+}).catch((error)=>{
+    console.error("MongoDB connection error:", error.message);
+});
 
 const initialEvents = [
   {
