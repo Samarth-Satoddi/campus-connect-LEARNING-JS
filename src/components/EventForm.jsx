@@ -52,6 +52,7 @@ function EventForm({ onAddEvent, onUpdateEvent, editingEvent }) {
   useEffect(function () {
     if (editingEvent != null) {
       setFormData({
+        _id: editingEvent._id,
         title: editingEvent.title,
         category: editingEvent.category,
         date: normalizeDateInput(editingEvent.date),
@@ -106,7 +107,7 @@ function EventForm({ onAddEvent, onUpdateEvent, editingEvent }) {
       });
     } else {
       onAddEvent({
-        id: Date.now(),
+       // id: Date.now(),
         ...eventData,
       });
     }

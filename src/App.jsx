@@ -58,7 +58,7 @@ function App() {
     }
 
     function handleUpdateEvent(updatedEvent) {
-        fetch(`http://localhost:5000/api/events/${updatedEvent.id}`, {
+        fetch(`http://localhost:5000/api/events/${updatedEvent._id}`, {
             method: "PUT",
             headers: {
                 "content-type": "application/json"
@@ -78,7 +78,7 @@ function App() {
 
     function handleEditEvent(eventID){
         const selectedEvent = events.find(function(event){
-            return event.id === eventID
+            return event._id === eventID
         });
         setEditingEvent(selectedEvent);
     }

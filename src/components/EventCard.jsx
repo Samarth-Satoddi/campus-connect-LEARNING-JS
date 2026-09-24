@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 function EventCard({
-  id,
+  _id,
   title,
   date,
   time,
